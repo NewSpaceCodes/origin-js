@@ -56,6 +56,7 @@ contract TokenVesting is Ownable {
       );
     }
     require(_cliffAmount > 0 || _vestingAmount > 0, "vesting contract has no value");
+
     owner = msg.sender;
     released = 0;
     beneficiary = _beneficiary;
@@ -74,16 +75,6 @@ contract TokenVesting is Ownable {
     return totalGrant().sub(vested());
   }
 
-  function vest() public returns (uint256) {
-    uint256 releasable = releasableAmount();
-    if (releasable == 0) {
-      return 0;
-    }
-    require(token.transfer(beneficiary, releasable), "transfer failed");
-    emit Vested(releasable);
-    return releasable;
-  }
-
   function vested() public view returns (uint256) {
     if (now < cliff) {
       return 0;
@@ -97,9 +88,19 @@ contract TokenVesting is Ownable {
     }
     return v;
   }
-
+  
   function releasableAmount() public view returns (uint256) {
     return vested().sub(released);
+  }
+  
+  function vest() public returns (uint256) {
+    uint256 releasable = releasableAmount();
+    if (releasable == 0) {
+      return 0;
+    }
+    require(token.transfer(beneficiary, releasable), "transfer failed");
+    emit Vested(releasable);
+    return releasable;
   }
 
   function revoke() public onlyOwner {
