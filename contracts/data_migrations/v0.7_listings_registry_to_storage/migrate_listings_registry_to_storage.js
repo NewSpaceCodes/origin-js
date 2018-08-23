@@ -68,7 +68,6 @@ try {
     process.exit();
 }
 
-
 // Defaults and fallbacks
 if (!config.srcGateway) {
     config.srcGateway = 'https://rinkeby.infura.io'
@@ -76,15 +75,19 @@ if (!config.srcGateway) {
 }
 if (!config.dstGateway) {
     config.dstGateway = 'https://rinkeby.infura.io'
-    console.log(`Using default dstGateway: ${config.srcGateway}`)
+    console.log(`Using default dstGateway: ${config.dstGateway}`)
 }
 if (!config.mnemonic && process.env.RINKEBY_MNEMONIC && config.dstGateway.includes('rinkeby')) {
     console.log('Using RINKEBY_MNEMONIC env var.')
-    config.mnemonic = css.env.RINKEBY_MNEMONIC
+    config.mnemonic = process.env.RINKEBY_MNEMONIC
 }
 if (!config.mnemonic && process.env.ROPSTEN_MNEMONIC && config.dstGateway.includes('ropsten')) {
     console.log('Using ROPSTEN_MNEMONIC env var.')
-    config.mnemonic = css.env.ROPSTEN_MNEMONIC
+    config.mnemonic = process.env.ROPSTEN_MNEMONIC
+}
+if (!config.mnemonic) {
+    console.error('No mnemonic found. Add `mnemonic` to config file, or set env var.')
+    process.exit();
 }
 
 /////////////////////////////////////////////////
@@ -433,7 +436,7 @@ Migration.prototype.write = async function() {
     let numRetries = 0;
     for (i = 0; i < numListings; i++) {
         const listingID = listingIDs[i];
-        console.log("Submitting listing: " + listingID);
+        console.log(`Submitting listing: ${listingID} / ${numListings}`);
         txHash = await this.createListing(listings[listingID], initialNonce + i);
         if (txHash) {
             numRetries = 0;

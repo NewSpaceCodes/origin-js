@@ -1,0 +1,9 @@
+{
+	"srcGateway": "https://rinkeby.infura.io",
+	"dstGateway": "https://127.0.0.1:8545",
+	"listingsRegistryAddress": "0xf9555a250a36f59c6b74aabec018b8f55da72ec4",
+	"newListingsRegistryAddress":"0x8f0483125fcb9aaaefa9209d8e9d7b9c8b9fb90f",
+	"gasSafetyMarginMultiplier": 1.2,
+	"numConfirmations": 1,
+	"mnemonic": "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat"
+}

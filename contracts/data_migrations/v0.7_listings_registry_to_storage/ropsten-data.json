@@ -1,46 +1,4 @@
 {
-    "0": {
-        "index": 0,
-        "lister": "0x564AAe0251d49d1F8d4d8d9E5da08f8CcEFf9eF2",
-        "ipfsHash": "QmTfozaMrUBZdYBzPgxuSC15zBRgLCEfQmWFZwmDHYGY1e",
-        "price": "3000000000000000000",
-        "unitsAvailable": 0
-    },
-    "1": {
-        "index": 1,
-        "lister": "0x1a5c29c94D03C4c8f7414564CBD57295d61e898f",
-        "ipfsHash": "QmZD8wZWEqzKwvEtGWXzCb3MuXvmxLdCxXGHMRocQFnpoy",
-        "price": "600000000000000000",
-        "unitsAvailable": 0
-    },
-    "2": {
-        "index": 2,
-        "lister": "0x564AAe0251d49d1F8d4d8d9E5da08f8CcEFf9eF2",
-        "ipfsHash": "QmZtQDL4UjQWryQLjsS5JUsbdbn2B27Tmvz2gvLkw7wmmb",
-        "price": "8500000000000000000",
-        "unitsAvailable": 0
-    },
-    "3": {
-        "index": 3,
-        "lister": "0x1a5c29c94D03C4c8f7414564CBD57295d61e898f",
-        "ipfsHash": "QmVYeipL2JWFkpWsGqNNXDFUVAmPWEEK8u3Q45CZ1YrZPf",
-        "price": "1500000000000000000",
-        "unitsAvailable": 0
-    },
-    "4": {
-        "index": 4,
-        "lister": "0x1a5c29c94D03C4c8f7414564CBD57295d61e898f",
-        "ipfsHash": "QmfXRgtSbrGggApvaFCa88ofeNQP79G18DpWaSW1Wya1u8",
-        "price": "300000000000000000",
-        "unitsAvailable": 18
-    },
-    "5": {
-        "index": 5,
-        "lister": "0xD3c4cfEdf3f87B7e116D71a27b7518C34d5B435b",
-        "ipfsHash": "QmZCqAvePsSu4i8PXghJw8tr2wtEMLrAXRM4d9MDTeRvbw",
-        "price": "1000000000000000000000000",
-        "unitsAvailable": 1
-    },
     "6": {
         "index": 6,
         "lister": "0xD3c4cfEdf3f87B7e116D71a27b7518C34d5B435b",
