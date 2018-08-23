@@ -43,6 +43,7 @@ const MAX_RETRIES = 7;
 
 const listingsRegistryAbi = require("./ListingsRegistry_v0_6")['abi'];
 const newListingsRegistryAbi = require("./ListingsRegistry_new")['abi'];
+const unitListingAbi = require("./UnitListing")['abi'];
 
 const parser = new ArgumentParser({addHelp: true});
 parser.addArgument(['-c', '--configFile'], {help: 'config file path', required: true});
@@ -200,12 +201,14 @@ Migration.prototype.getAllListings = async function(numListings) {
 Migration.prototype.getListing = async function(index) {
     for (let i = 0; i < MAX_RETRIES; i++) {
         try {
-            const listingData = await this.contract.methods.getListing(index).call();
+            const unitListingAddress = await this.contract.methods.getListingAddress(index).call();
+            const unitListing = new this.web3.eth.Contract(unitListingAbi, unitListingAddress);
+            const listingData = await unitListing.methods.data().call();
             listing = {
                 index: index,
-                lister: listingData[1],
-                ipfsHash: this.getIpfsHashFromBytes32(listingData[2]),
-                price: String(listingData[3]), // In wei
+                lister: listingData[0],
+                ipfsHash: this.getIpfsHashFromBytes32(listingData[1]),
+                price: String(listingData[2]), // In wei
                 unitsAvailable: parseInt(listingData[4])
             }
             console.log(listing)
