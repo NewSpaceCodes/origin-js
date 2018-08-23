@@ -4,7 +4,7 @@
 	"srcGateway": "https://ropsten.infura.io",
 	"dstGateway": "https://ropsten.infura.io",
 	"listingsRegistryAddress": "0x2861f28756e14cf0733383be8aa66ba3b65f1b4e",
-	"newListingsRegistryAddress":"0xAddress",
+	"newListingsRegistryAddress":"0x67057a6ddbc10d1c75a8812f770854f8627fc7b6",
 	"mnemonic": "the mnemonic goes here",
 	"gasSafetyMarginMultiplier": 1.2,
 	"numConfirmations": 1

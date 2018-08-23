@@ -24,10 +24,28 @@ Edit the `conf-sample.json` configuration file or create a new one that looks li
 
 After filling out the configuration, execute the script in read mode, passing in the config file to use and a destination file.
 
+### Rinkeby
 ```
-$ node migrate_listings_registry_to_storage.js -c ./conf-test-ropsten-local.json -d ./ropsten-data.json -a read
-Reading listings from: Ropsten - Gateway: https://ropsten.infura.io
----------------- ----------------------------
+$ node migrate_listings_registry_to_storage.js \
+  -c ./conf-rinkeby.json \
+  -d ./rinkeby-data.json \
+  -a read
+Reading listings from gateway: https://rinkeby.infura.io
+--------------------------------------------
+Source contract address: 0xf9555a250a36f59c6b74aabec018b8f55da72ec4
+Found 535 listings.
+Retrieved 535 listings from source contract.
+Wrote 535 listings to data file: ./rinkeby-data.json
+```
+
+### Ropsten
+```
+$ node migrate_listings_registry_to_storage.js \
+  -c ./conf-ropsten.json \
+  -d ./ropsten-data.json \
+  -a read
+Reading listings from gateway: https://ropsten.infura.io
+--------------------------------------------
 Source contract address: 0x2861f28756e14cf0733383be8aa66ba3b65f1b4e
 Found 85 listings.
 Retrieved 85 listings from source contract.
@@ -39,8 +57,12 @@ We now have a JSON file backup of the listings from the registry at `listingsReg
 ## Step 3: Migrate data from local JSON file to new ListingsRegistry
 
 Next, execute the script in write mode:
+
 ```
-$ node migrate_listings_registry_to_storage.js -c ./conf-test-ropsten-local.json -d ./ropsten-data.json -a write`
+$ node migrate_listings_registry_to_storage.js \
+  -c ./conf-ropsten.json \
+  -d ./ropsten-data.json \
+  -a write
 ```
 
 This will populate the `ListingsRegistry` at `newListingsRegistryAddress` with the listings from the JSON file generated in step 2.

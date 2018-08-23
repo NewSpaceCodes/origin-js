@@ -14,7 +14,6 @@
 // Script parameters:
 //
 //   config (json):
-//     srcNetworkName, dstNetworkName
 //     srcGateway, dstGateway
 //     listingsRegistryAddress, newListingsRegistryAddress
 //     privateKey: of account to send txns to ListingsRegistry#Create from
@@ -22,7 +21,7 @@
 //     numConfirmations: # to wait before listing is considered migrated
 //
 //
-//   data_file (json): when migrating, listings are read from the source 
+//   data_file (json): when migrating, listings are read from the source
 //                     contract and written to this file, then read from
 //                     this file and written to the destination contract
 //
@@ -60,18 +59,36 @@ Array.prototype.remove = function(el) {
     }
 }
 
+// Load configuration
 try {
     var config = require(args.configFile);
 } catch(e) {
-    console.log("Error loading config file: " + e);
+    console.error("Error loading config file: " + e);
     process.exit();
+}
+
+
+// Defaults and fallbacks
+if (!config.srcGateway) {
+    config.srcGateway = 'https://rinkeby.infura.io'
+    console.log(`Using default srcGateway: ${config.srcGateway}`)
+}
+if (!config.dstGateway) {
+    config.dstGateway = 'https://rinkeby.infura.io'
+    console.log(`Using default dstGateway: ${config.srcGateway}`)
+}
+if (!config.mnemonic && process.env.RINKEBY_MNEMONIC && config.dstGateway.includes('rinkeby')) {
+    console.log('Using RINKEBY_MNEMONIC env var.')
+    config.mnemonic = css.env.RINKEBY_MNEMONIC
+}
+if (!config.mnemonic && process.env.ROPSTEN_MNEMONIC && config.dstGateway.includes('ropsten')) {
+    console.log('Using ROPSTEN_MNEMONIC env var.')
+    config.mnemonic = css.env.ROPSTEN_MNEMONIC
 }
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 function Migration(config, dataFile) {
-    this.srcNetworkName = config.srcNetworkName;
-    this.dstNetworkName = config.dstNetworkName;
     this.srcGateway = config.srcGateway;
     this.dstGateway = config.dstGateway;
     this.listingsRegistryAddress = config.listingsRegistryAddress;
@@ -188,13 +205,13 @@ Migration.prototype.getListing = async function(index) {
                 index: index,
                 lister: listingData[1],
                 ipfsHash: this.getIpfsHashFromBytes32(listingData[2]),
-                price: String(listingData[3]), // in wei
+                price: String(listingData[3]), // In wei
                 unitsAvailable: parseInt(listingData[4])
             }
-            // console.log(listing)
+            console.log(listing)
             return listing;
         } catch(e) {
-            console.log("error getting listing, retrying: " + e);
+            console.error("Error getting listing, retrying: " + e);
         }
     }
 }
@@ -308,10 +325,10 @@ Migration.prototype.confirm = async function(txToListings) {
                 }
             }
 
-                console.log("    submitted: " + this.submittedListings.length + " | mined: " + this.minedListings.length + " | confirmed: " + this.confirmedListings.length);
-                if (this.confirmedListings.length == numTotalTransactions) {
-                    return true;
-                }
+            console.log("    submitted: " + this.submittedListings.length + " | mined: " + this.minedListings.length + " | confirmed: " + this.confirmedListings.length);
+            if (this.confirmedListings.length == numTotalTransactions) {
+                return true;
+            }
 
         } catch(e) {
             console.log("Request error: " + e + ", continuing to next interval.");
@@ -536,7 +553,7 @@ Migration.prototype.printResults = function() {
 var migration = new Migration(config, args.dataFile);
 
 if (args.action == 'read') {
-    console.log("Reading listings from: " + config.srcNetworkName + " - Gateway: " + config.srcGateway);
+    console.log("Reading listings from gateway: " + config.srcGateway);
     console.log("--------------------------------------------");
 
     try {
@@ -547,7 +564,7 @@ if (args.action == 'read') {
     }
 
 } else if (args.action == 'write') {
-    console.log("Creating listings on: " + config.dstNetworkName + " - Gateway: " + config.dstGateway);
+    console.log("Creating listings on gateway: " + config.dstGateway);
     console.log("--------------------------------------------");
 
     // Assumes no listings in data file have been migrated
