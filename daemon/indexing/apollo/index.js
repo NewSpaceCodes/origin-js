@@ -20,9 +20,9 @@ const typeDefs = gql`
 
   # When querying a set of items, the output is a page.
   interface OutputPage {
-    num: Int!      # Current page number
-    size: Int!     # Size of pages.
-    total: Int!    # Total number of pages available.
+    pageNumber: Int!
+    itemsPerPage: Int!
+    totalNumberOfPages: Int!
   }
 
   type Price {
@@ -56,9 +56,9 @@ const typeDefs = gql`
   }
 
   type OfferPage implements OutputPage {
-    num: Int!
-    size: Int!
-    total: Int!
+    pageNumber: Int!
+    itemsPerPage: Int!
+    totalNumberOfPages: Int!
     offers: [Offer]
   }
 
@@ -70,9 +70,9 @@ const typeDefs = gql`
   }
 
   type ReviewPage implements OutputPage {
-    num: Int!
-    size: Int!
-    total: Int!
+    pageNumber: Int!
+    itemsPerPage: Int!
+    totalNumberOfPages: Int!
     reviews: [Review]
   }
 
@@ -91,9 +91,9 @@ const typeDefs = gql`
   }
 
   type ListingPage implements OutputPage {
-    num: Int!
-    size: Int!
-    total: Int!
+    pageNumber: Int!
+    itemsPerPage: Int!
+    totalNumberOfPages: Int!
     listings: [Listing]
   }
 
@@ -111,8 +111,8 @@ const typeDefs = gql`
   }
 
   input Page {
-    num: Int!  # Page number.
-    size: Int! # Number of items per page.
+    pageNumber: Int!  # Page number.
+    itemsPerPage: Int! # Number of items per page.
   }
 
   input inPrice {
@@ -207,9 +207,9 @@ const resolvers = {
         listings = await db.Listing.all()
       }
       return {
-        num: 1,
-        size: listings.length,
-        total: 1,
+        pageNumber: 1,
+        itemsPerPage: listings.length,
+        totalNumberOfPages: 1,
         listings: listings,
       }
     },
@@ -240,9 +240,9 @@ const resolvers = {
     offers(listing, args) {
       // TODO: handle pagination (including enforcing MaxResultsPerPage), filters, order.
       return {
-        num: 1,
-        size: 1,
-        total: 1,
+        pageNumber: 1,
+        itemsPerPage: 1,
+        totalNumberOfPages: 1,
         offers: [{
           id: '123', ipfsHash: 'IPFS_H', listingId: listing.id,
           buyer: {walletAddress: 'B_WADDR',}, status: 'ACCEPTED',
@@ -252,9 +252,9 @@ const resolvers = {
     reviews(listing, args) {
       // TODO: handle pagination (including enforcing MaxResultsPerPage), filters, order.
       return {
-        num: 1,
-        size: 1,
-        total: 1,
+        pageNumber: 1,
+        itemsPerPage: 1,
+        totalNumberOfPages: 1,
         reviews: [{
           ipfsHash: 'IPFS_H', reviewer: {walletAddress: 'R_WADDR'},
           text: 'Great product. Great seller.', rating: 5,

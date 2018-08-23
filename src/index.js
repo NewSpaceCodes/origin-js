@@ -26,6 +26,8 @@ class Origin {
     ipfsGatewayProtocol = defaultIpfsGatewayProtocol,
     attestationServerUrl = defaultAttestationServerUrl,
     indexingServerUrl = defaultIndexingServerUrl,
+    apolloServer = defaultApolloServer,
+    apolloServerPort = defaultApolloServerPort,
     contractAddresses,
     web3,
     ipfsCreator,
@@ -53,8 +55,8 @@ class Origin {
       contractService: this.contractService,
       ipfsService: this.ipfsService,
       indexingServerUrl,
-      defaultApolloServer,
-      defaultApolloServerPort,
+      apolloServer,
+      apolloServerPort,
       fetch
     })
 

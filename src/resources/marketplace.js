@@ -6,12 +6,14 @@ import { validateListing } from '../utils/schemaValidators'
 import Adaptable from './adaptable'
 
 class Marketplace extends Adaptable {
-  constructor({ contractService, ipfsService, fetch, indexingServerUrl }) {
+  constructor({ contractService, ipfsService, fetch, indexingServerUrl, apolloServer, apolloServerPort }) {
     super(...arguments)
     this.contractService = contractService
     this.ipfsService = ipfsService
     this.indexingServerUrl = indexingServerUrl
     this.fetch = fetch
+    this.apolloServer = apolloServer
+    this.apolloServerPort = apolloServerPort
   }
 
   async getListingsCount() {
@@ -71,16 +73,17 @@ class Marketplace extends Adaptable {
       Listings (
         searchQuery: "${searchQuery}"
       ) {
-        totalCount
-        more
+        pageNumber
+        itemsPerPage
+        totalNumberOfPages
         listings {
           id
 
         }
       }
     }`
-    const url = `${this.defaultApolloServer}:${this.defaultApolloServerPort}`
-    const response = await this.fetch(url, {
+
+    return this.fetch(`${this.apolloServer}:${this.apolloServerPort}`, {
         method: 'POST',
         body: JSON.stringify({
           query:query
@@ -90,9 +93,6 @@ class Marketplace extends Adaptable {
         },
       }
     )
-
-    console.log(response.json())
-
   }
 
   // async getOffersCount(listingId) {}
