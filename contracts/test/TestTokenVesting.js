@@ -1,4 +1,4 @@
-const Token = artifacts.require('Token')
+const OriginToken = artifacts.require('OriginToken')
 const TokenVesting = artifacts.require('TokenVesting')
 
 const moment = require('moment')
@@ -30,7 +30,7 @@ contract('TestVesting', ([owner, beneficiary]) => {
   let start
 
   beforeEach(async function() {
-    token = await Token.new('Token', 'TKN', 0, initialSupply, {from: owner})
+    token = await OriginToken.new(initialSupply)
     startUnix = await blockTimestamp()
     start = moment.unix(startUnix)
   })
@@ -53,10 +53,10 @@ contract('TestVesting', ([owner, beneficiary]) => {
     )
 
     const cliffSeconds = vestingCliff.unix() - await blockTimestamp()
-    await timeTravel(cliffSeconds - 1)
+    await timeTravel(cliffSeconds - 2)
     let vestedBeforeCliff = await vesting.vested()
     assert.equal(vestedBeforeCliff, 0)
-    await timeTravel(1)
+    await timeTravel(2)
     let vestedAfterCliff = await vesting.vested()
     assert.equal(vestedAfterCliff, 1200)
   })
