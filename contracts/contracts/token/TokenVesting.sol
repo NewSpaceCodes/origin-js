@@ -15,8 +15,8 @@ contract TokenVesting is Ownable {
   event Revoked();
   event Debug(uint256 d);
 
-  // Total number of tokens vested so far
-  uint256 public released;
+  // Total number of tokens transferred to the beneciary so far
+  uint256 public transferred;
   // Address to which tokens are transferred during vesting
   address public beneficiary;
   // Whether this contract has been revoked (tokens refunded to owner)
@@ -64,7 +64,7 @@ contract TokenVesting is Ownable {
     );
 
     owner = msg.sender;
-    released = 0;
+    transferred = 0;
     beneficiary = _beneficiary;
     token = _token;
     cliffTimestamp = _cliffTimestamp;
@@ -100,29 +100,29 @@ contract TokenVesting is Ownable {
 
   // @dev Returns the number of tokens that can be transferred to the
   // beneficiary
-  function releasableAmount() public view returns (uint256) {
-    return vested().sub(released);
+  function transferrableAmount() public view returns (uint256) {
+    return vested().sub(transferred);
   }
 
-  // @dev Transfers vested tokens to the beneficiary
-  function vest() public returns (uint256) {
-    uint256 releasable = releasableAmount();
-    if (releasable == 0) {
-      return 0;
+  // @dev Transfers vested tokens due to the beneficiary. Though this can be
+  // called by anyone, the tokens may only be transferred to the beneficiary.
+  function vest() public {
+    uint256 amount = transferrableAmount();
+    if (amount > 0) {
+      transferred = transferred.add(amount);
+      require(token.transfer(beneficiary, amount), "transfer failed");
+      emit Vested(amount);
     }
-    require(token.transfer(beneficiary, releasable), "transfer failed");
-    emit Vested(releasable);
-    return releasable;
   }
 
-  // @dev Revoke this vesting contract, refunding any remaining tokens to the
-  // owner of this contract
+  // @dev Revoke this vesting contract, refunding any unvested tokens to the
+  // contract owner. Vested tokens stay in the contract.
   function revoke() public onlyOwner {
     require(!revoked, "contract already revoked");
 
     uint256 balance = token.balanceOf(address(this));
-    uint256 unreleased = releasableAmount();
-    uint256 refund = balance.sub(unreleased);
+    uint256 transferrable = transferrableAmount();
+    uint256 refund = balance.sub(transferrable);
     revoked = true;
     require(token.transfer(owner, refund), "transfer failed");
     emit Revoked();
