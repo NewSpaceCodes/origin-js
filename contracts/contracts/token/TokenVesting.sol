@@ -25,7 +25,7 @@ contract TokenVesting is Ownable {
   // Token contract for this grant.
   ERC20 public token;
   // UNIX timestamp of vesting cliff
-  uint256 public cliff;
+  uint256 public cliffTimestamp;
   // Number of tokens vested at cliff
   uint256 public cliffAmount;
   // UNIX timestamps for all vesting event. For example, monthly vesting would
@@ -37,7 +37,7 @@ contract TokenVesting is Ownable {
   constructor(
     address _beneficiary,
     ERC20 _token, // TODO: replace this with an ENS name!
-    uint256 _cliff,
+    uint256 _cliffTimestamp,
     uint256 _cliffAmount,
     uint256[] _vestingTimestamps,
     uint256 _vestingAmount
@@ -47,7 +47,10 @@ contract TokenVesting is Ownable {
     // Verify that the timestamps are in ascending order, because we rely on
     // that elsewhere.
     if (_vestingTimestamps.length > 0) {
-      require(_vestingTimestamps[0] > _cliff, "vesting event must happen after cliff");
+      require(
+        _vestingTimestamps[0] > _cliffTimestamp,
+        "vesting events must happen after cliff"
+      );
     }
     for (uint i = 1; i < _vestingTimestamps.length; i++) {
       require(
@@ -55,28 +58,34 @@ contract TokenVesting is Ownable {
         "vesting timestamps must be in ascending order"
       );
     }
-    require(_cliffAmount > 0 || _vestingAmount > 0, "vesting contract has no value");
+    require(
+      _cliffAmount > 0 || _vestingAmount > 0,
+      "vesting contract has no value"
+    );
 
     owner = msg.sender;
     released = 0;
     beneficiary = _beneficiary;
     token = _token;
-    cliff = _cliff;
+    cliffTimestamp = _cliffTimestamp;
     cliffAmount = _cliffAmount;
     vestingTimestamps = _vestingTimestamps;
     vestingAmount = _vestingAmount;
   }
 
+  // @dev Returns the total number of tokens in this grant
   function totalGrant() public view returns (uint256) {
     return cliffAmount.add(vestingAmount.mul(vestingTimestamps.length));
   }
 
+  // @dev Returns the unvested tokens
   function unvested() public view returns (uint256) {
     return totalGrant().sub(vested());
   }
 
+  // @dev Returns the total number of tokens vested so far
   function vested() public view returns (uint256) {
-    if (now < cliff) {
+    if (now < cliffTimestamp) {
       return 0;
     }
     uint256 v = cliffAmount;
@@ -88,11 +97,14 @@ contract TokenVesting is Ownable {
     }
     return v;
   }
-  
+
+  // @dev Returns the number of tokens that can be transferred to the
+  // beneficiary
   function releasableAmount() public view returns (uint256) {
     return vested().sub(released);
   }
-  
+
+  // @dev Transfers vested tokens to the beneficiary
   function vest() public returns (uint256) {
     uint256 releasable = releasableAmount();
     if (releasable == 0) {
@@ -103,14 +115,16 @@ contract TokenVesting is Ownable {
     return releasable;
   }
 
+  // @dev Revoke this vesting contract, refunding any remaining tokens to the
+  // owner of this contract
   function revoke() public onlyOwner {
-    require(!revoked);
+    require(!revoked, "contract already revoked");
 
     uint256 balance = token.balanceOf(address(this));
     uint256 unreleased = releasableAmount();
     uint256 refund = balance.sub(unreleased);
     revoked = true;
-    require(token.transfer(owner, refund));
+    require(token.transfer(owner, refund), "transfer failed");
     emit Revoked();
   }
 }
