@@ -4,6 +4,12 @@ import linker from 'solc/linker'
 import Ganache from 'ganache-core'
 import Web3 from 'web3'
 
+// import BigNumber testing helpers
+const BigNumber = Web3.BigNumber
+import chai from 'chai'
+import ChaiBigNumber from 'chai-bignumber'
+chai.use(ChaiBigNumber(BigNumber)).should()
+
 const solcOpts = {
   language: 'Solidity',
   settings: {
@@ -183,7 +189,42 @@ export default async function testHelper(contracts, provider) {
     return web3.eth.abi.decodeLog(ruling.inputs, data, topics)
   }
 
-  return { web3, accounts, deploy, server, decodeEvent }
+  async function blockTimestamp() {
+    const block = await web3.eth.getBlock('latest')
+    return block.timestamp
+  }
+
+  async function timeTravel(seconds) {
+    // This is ugly, but is there a better way?
+    await web3.currentProvider.send({
+      jsonrpc: '2.0',
+      method: 'evm_increaseTime',
+      params: [seconds],
+      id: new Date().getSeconds()
+    }, (err, _) => {
+      if (err) {
+        return
+      }
+      web3.currentProvider.send({
+        jsonrpc: '2.0',
+        method: 'evm_mine',
+        params: [],
+        id: new Date().getSeconds()
+      }, (err, _) => {
+
+      })
+    })
+  }
+
+  return {
+    web3,
+    accounts,
+    deploy,
+    server,
+    decodeEvent,
+    blockTimestamp,
+    timeTravel
+  }
 }
 
 // Start the server if it hasn't been already...
